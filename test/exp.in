@@ -6,14 +6,14 @@ iodepth=16
 
 [job1]
 name=krven1
-size=8m
+size=8M
 rw=read
-bs=4k
+bs=512k
 numjobs=1
 
 [job2]
 name=krven2
-size=8m
+size=8M
 rw=write
 bs=512k
-numjobs=1
+numjobs=2

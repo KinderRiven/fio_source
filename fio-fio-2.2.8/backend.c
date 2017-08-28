@@ -772,13 +772,14 @@ static int io_complete_bytes_exceeded(struct thread_data *td)
  *
  * Returns number of bytes written and trimmed.
  */
-static void krven_show_io_u_stat(struct thread_data *td, struct io_u *io_u) {
-
-	krven_debug_print("acct_ddir:[%d],", io_u->acct_ddir);
-	krven_debug_print("size:[%ld:%lld],", io_u->buflen, io_u->offset);
-	krven_debug_print("num:[%d],", io_u->numberio);
-	krven_debug_print("start_time:[%ld %d],", io_u->start_time.tv_sec, io_u->start_time.tv_usec);
-	krven_debug_print("end_time:[%ld %d]\n", io_u->issue_time.tv_sec, io_u->issue_time.tv_usec);
+static void krven_show_io_u_stat(int ret, struct thread_data *td, struct io_u *io_u) {
+    krven_debug_print("result : [%d] ", ret);
+	krven_debug_print("acct_ddir:[%d] ", io_u->acct_ddir);
+	krven_debug_print("size:[%lu:%llu] ", io_u->buflen, io_u->offset);
+	krven_debug_print("num:[%u] ", io_u->numberio);
+	krven_debug_print("start_time:[%ld:%d] ", io_u->start_time.tv_sec, io_u->start_time.tv_usec);
+	krven_debug_print("issue_time:[%ld:%d]\n", io_u->issue_time.tv_sec, io_u->issue_time.tv_usec);
+    //krven_debug_print("comp_time:[%ld:%d]\n", io_u->comp_time.tv_sec, io_u->comp_time.tv_usec);
     td->io_u_sum++;
     td->io_u_usec += 1000000LL * (io_u->issue_time.tv_sec-io_u->start_time.tv_sec)
                      + (io_u->issue_time.tv_usec-io_u->start_time.tv_usec);
@@ -821,8 +822,8 @@ static uint64_t do_io(struct thread_data *td)
 		(!flist_empty(&td->trim_list)) || !io_issue_bytes_exceeded(td) ||
 		td->o.time_based) {
 		struct timeval comp_time;
-		struct timespec start_time;
-        struct timespec end_time;
+		//struct timespec start_time;
+        //struct timespec end_time;
 		struct io_u *io_u;
 		int full;
 		enum fio_ddir ddir;
@@ -913,6 +914,8 @@ static uint64_t do_io(struct thread_data *td)
 			if (io_queue_event(td, io_u, &ret, ddir, &bytes_issued, 1, &comp_time)) {
 				break;
 			}
+            //io_u->comp_time.tv_usec = comp_time.tv_usec;
+            //io_u->comp_time.tv_sec = comp_time.tv_sec;
             //clock_gettime(CLOCK_REALTIME, &end_time);
             //if(KRVEN_DEBUG) {
             //    long int t_sec = end_time.tv_sec - start_time.tv_sec;
@@ -920,7 +923,7 @@ static uint64_t do_io(struct thread_data *td)
             //    log_info("solve time:[%ld %ld]\n", t_sec, t_nsec);
             //}
             //计算每一个io_u的延迟情况
-            krven_show_io_u_stat(td, io_u);
+            krven_show_io_u_stat(ret, td, io_u);
 			/*
 			 * See if we need to complete some commands. Note that
 			 * we can get BUSY even without IO queued, if the
