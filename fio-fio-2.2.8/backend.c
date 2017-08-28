@@ -786,8 +786,9 @@ static void krven_show_io_u_stat(int ret, struct thread_data *td, struct io_u *i
 	krven_debug_print("size:[%lu:%llu] ", io_u->buflen, io_u->offset);
 	krven_debug_print("num:[%u] ", io_u->numberio);
 	krven_debug_print("start_time:[%ld:%d] ", io_u->start_time.tv_sec, io_u->start_time.tv_usec);
-	krven_debug_print("issue_time:[%ld:%d]\n", io_u->issue_time.tv_sec, io_u->issue_time.tv_usec);
-    //krven_debug_print("comp_time:[%ld:%d]\n", io_u->comp_time.tv_sec, io_u->comp_time.tv_usec);
+	krven_debug_print("issue_time:[%ld:%d]", io_u->issue_time.tv_sec, io_u->issue_time.tv_usec);
+    krven_debug_print("comp_time:[%ld:%d]", io_u->comp_time.tv_sec, io_u->comp_time.tv_usec);
+    krven_debug_print("\n");
     td->io_u_sum++;
     td->io_u_usec += 1000000LL * (io_u->issue_time.tv_sec-io_u->start_time.tv_sec)
                      + (io_u->issue_time.tv_usec-io_u->start_time.tv_usec);
@@ -922,8 +923,8 @@ static uint64_t do_io(struct thread_data *td)
 			if (io_queue_event(td, io_u, &ret, ddir, &bytes_issued, 1, &comp_time)) {
 				break;
 			}
-            //io_u->comp_time.tv_usec = comp_time.tv_usec;
-            //io_u->comp_time.tv_sec = comp_time.tv_sec;
+            io_u->comp_time.tv_usec = comp_time.tv_usec;
+            io_u->comp_time.tv_sec = comp_time.tv_sec;
             //clock_gettime(CLOCK_REALTIME, &end_time);
             //if(KRVEN_DEBUG) {
             //    long int t_sec = end_time.tv_sec - start_time.tv_sec;
