@@ -1,0 +1,3 @@
+/Users/hanshukai/fio/fio-fio-2.2.8/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/hanshukai/fio/fio-fio-2.2.8/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/hanshukai/fio/fio-fio-2.2.8/cmake-build-debug/CMakeFiles/fio_fio_2_2_8.dir
