@@ -89,8 +89,16 @@ volatile int helper_exit = 0;
 int krven_debug = 1;
 
 int krven_debug_print(const char *format, ...) {
-	if(krven_debug)
-		return log_info(format);
+	if(krven_debug) {
+        char buffer[1024];
+        va_list args;
+        size_t len;
+        va_start(args, format);
+        len = vsnprintf(buffer, sizeof(buffer), format, args);
+        va_end(args);
+        len = min(len, sizeof(buffer) - 1);
+        return fwrite(buffer, len, 1, stdout);
+    }
 	return -1;
 }
 
