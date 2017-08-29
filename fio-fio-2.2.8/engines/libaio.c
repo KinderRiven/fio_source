@@ -250,6 +250,7 @@ static int fio_libaio_commit(struct thread_data *td)
         //Linux进行读写
         //这里进行大块的提交
 		ret = io_submit(ld->aio_ctx, nr, iocbs);
+        log_info("ret nr [%ld][%d]\n", nr, ret);
         if (ret > 0) {
 			fio_libaio_queued(td, io_us, ret);
 			io_u_mark_submit(td, ret);
