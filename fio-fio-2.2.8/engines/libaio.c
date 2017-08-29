@@ -184,7 +184,7 @@ static int fio_libaio_queue(struct thread_data *td, struct io_u *io_u)
 	struct libaio_data *ld = td->io_ops->data;
 	fio_ro_check(td, io_u);
     //队列是否忙
-    log_info("queue [%d %d]\n", ld->queued, td->o.iodepth);
+    //log_info("queue [%d %d]\n", ld->queued, td->o.iodepth);
     //忙的状态
 	if (ld->queued == td->o.iodepth)
 		return FIO_Q_BUSY;

@@ -8,8 +8,8 @@ static int krven_debug_thread_data = 1;
 static int krven_debug_io_u = 1;
 
 int krven_init() {
-    krven_debug = 1;
-    krven_debug_thread_data = 1;
+    krven_debug = 0;
+    krven_debug_thread_data = 0;
     krven_debug_io_u = 0;
 }
 

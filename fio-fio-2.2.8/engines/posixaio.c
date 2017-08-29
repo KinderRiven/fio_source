@@ -190,7 +190,6 @@ static int fio_posixaio_queue(struct thread_data *td,
 #else
 		if (pd->queued)
 			return FIO_Q_BUSY;
-
 		do_io_u_sync(td, io_u);
 		return FIO_Q_COMPLETED;
 #endif

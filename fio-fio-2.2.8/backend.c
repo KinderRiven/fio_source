@@ -897,9 +897,14 @@ static uint64_t do_io(struct thread_data *td)
             //打印信息
             krven_print_io_u(ret, io_u);
             //save
-            td->io_u_sum++;
-            td->io_u_usec += 1000000LL * (io_u->issue_time.tv_sec-io_u->start_time.tv_sec)
-                             + (io_u->issue_time.tv_usec-io_u->start_time.tv_usec);
+            if(ret == 0 || ret == 1) {
+                td->io_u_sum++;
+                td->io_u_usec += 1000000LL * (io_u->issue_time.tv_sec - io_u->start_time.tv_sec)
+                                 + (io_u->issue_time.tv_usec - io_u->start_time.tv_usec);
+            }
+            else {
+                log_info("queue busy\n");
+            }
 			/*
 			 * See if we need to complete some commands. Note that
 			 * we can get BUSY even without IO queued, if the
