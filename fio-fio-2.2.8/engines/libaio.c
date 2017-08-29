@@ -254,7 +254,6 @@ static int fio_libaio_commit(struct thread_data *td)
 		if (ret > 0) {
 			fio_libaio_queued(td, io_us, ret);
 			io_u_mark_submit(td, ret);
-
 			ld->queued -= ret;
 			ring_inc(ld, &ld->tail, ret);
 			ret = 0;

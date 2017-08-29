@@ -106,8 +106,6 @@ enum {
  * This describes a single thread/process executing a fio job.
  */
 struct thread_data {
-	//long long int io_u_num;
-	//long long int io_u_usec;
 	struct thread_options o;
 	unsigned long flags;
 	void *eo;
@@ -126,7 +124,6 @@ struct thread_data {
 	struct io_log *iops_log;
 
 	struct tp_data *tp_data;
-
 	struct thread_data *parent;
 
 	uint64_t stat_io_bytes[DDIR_RWDIR_CNT];

@@ -1,19 +1,11 @@
 [global]
 #filename=/dev/disk0
 direct=1
-ioengine=psync
-iodepth=16
+ioengine=posixaio
+iodepth=32
 
 [job1]
-name=krven1
-size=8M
-rw=read
-bs=512k
-numjobs=1
-
-[job2]
-name=krven2
-size=8M
-rw=write
-bs=512k
-numjobs=2
+size=128M
+rw=randwrite
+bs=4k
+numjobs=4

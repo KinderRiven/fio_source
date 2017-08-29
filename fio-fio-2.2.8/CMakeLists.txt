@@ -337,6 +337,8 @@ set(SOURCE_FILES
         verify.c
         verify.h
         workqueue.c
-        workqueue.h)
+        workqueue.h
+        krven_debug.h
+        krven_debug.c)
 
 add_executable(fio_fio_2_2_8 ${SOURCE_FILES})

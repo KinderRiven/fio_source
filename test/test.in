@@ -1,0 +1,10 @@
+[global]
+direct=1
+ioengine=posixaio
+iodepth=8
+
+[job1]
+size=8M
+rw=randwrite
+bs=512k
+numjobs=1

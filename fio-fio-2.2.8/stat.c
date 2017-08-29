@@ -10,6 +10,7 @@
 #include "fio.h"
 #include "diskutil.h"
 #include "lib/ieee754.h"
+#include "krven_debug.h"
 #include "json.h"
 #include "lib/getrusage.h"
 #include "idletime.h"
@@ -1373,15 +1374,6 @@ void init_thread_stat(struct thread_stat *ts)
 }
 
 
-//for ((i) = 0, (td) = &threads[0]; (i) < (int) thread_number; (i)++, (td)++)
-//fio.h : 436extern struct thread_data *threads;
-static void krven_show_stat(struct thread_data *td) {
-	krven_debug_print("thread number:[%d],", td->thread_number);
-	krven_debug_print("groupid:[%d],", td->groupid);
-	krven_debug_print("delay:[%lld/%lld]", td->io_u_usec, td->io_u_sum);
-	krven_debug_print("\n");
-}
-
 //打印的总入口
 void __show_run_stats(void)
 {
@@ -1396,7 +1388,7 @@ void __show_run_stats(void)
 	runstats = malloc(sizeof(struct group_run_stats) * (groupid + 1));
 	//debug print
     for_each_td(td, i) {
-        krven_show_stat(td);
+		krven_print_thread_data(td);
     }
 	//初始化
 	for (i = 0; i < groupid + 1; i++) {

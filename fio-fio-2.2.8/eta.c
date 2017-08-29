@@ -473,8 +473,6 @@ int calc_thread_status(struct jobs_eta *je, int force)
 
 void display_thread_status(struct jobs_eta *je)
 {
-	log_info("eta.c 447:start display thread status\n");
-
 	static struct timeval disp_eta_new_line;
 	static int eta_new_line_init, eta_new_line_pending;
 	static int linelen_last;

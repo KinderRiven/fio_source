@@ -1804,9 +1804,7 @@ static void ios_completed(struct thread_data *td,
 
 	for (i = 0; i < icd->nr; i++) {
 		io_u = td->io_ops->event(td, i);
-
 		io_completed(td, &io_u, icd);
-
 		if (io_u)
 			put_io_u(td, io_u);
 	}
@@ -1881,7 +1879,6 @@ void io_u_queued(struct thread_data *td, struct io_u *io_u)
 {
 	if (!td->o.disable_slat) {
 		unsigned long slat_time;
-
 		slat_time = utime_since(&io_u->start_time, &io_u->issue_time);
 		add_slat_sample(td, io_u->ddir, slat_time, io_u->xfer_buflen,
 				io_u->offset);
@@ -1908,7 +1905,6 @@ static struct frand_state *get_buf_state(struct thread_data *td)
 
 	if (v <= td->o.dedupe_percentage)
 		return &td->buf_state_prev;
-
 	return &td->buf_state;
 }
 

@@ -44,6 +44,7 @@
 #include "smalloc.h"
 #include "verify.h"
 #include "trim.h"
+#include "krven_debug.h"
 #include "diskutil.h"
 #include "cgroup.h"
 #include "profile.h"
@@ -84,23 +85,6 @@ volatile int helper_exit = 0;
 
 #define JOB_START_TIMEOUT	(5 * 1000)
 
-
-//My debug function
-int krven_debug = 1;
-
-int krven_debug_print(const char *format, ...) {
-	if(krven_debug) {
-        char buffer[1024];
-        va_list args;
-        size_t len;
-        va_start(args, format);
-        len = vsnprintf(buffer, sizeof(buffer), format, args);
-        va_end(args);
-        len = min(len, sizeof(buffer) - 1);
-        return fwrite(buffer, len, 1, stdout);
-    }
-	return -1;
-}
 
 static void sig_int(int sig)
 {
@@ -484,6 +468,7 @@ int io_queue_event(struct thread_data *td, struct io_u *io_u, int *ret,
 	int ret2;
 	switch (*ret) {
 	case FIO_Q_COMPLETED:
+        //如果做完了IO操作
 		if (io_u->error) {
 			*ret = -io_u->error;
 			clear_io_u(td, io_u);
@@ -537,12 +522,15 @@ sync_done:
 		 * the io_u is really queued. if it does have such
 		 * a hook, it has to call io_u_queued() itself.
 		 */
-		if (td->io_ops->commit == NULL)
-			io_u_queued(td, io_u);
-		if (bytes_issued)
-			*bytes_issued += io_u->xfer_buflen;
+        //如果没有进行提交
+		if (td->io_ops->commit == NULL) {
+            io_u_queued(td, io_u);
+        }
+		if (bytes_issued) {
+            *bytes_issued += io_u->xfer_buflen;
+        }
 		break;
-	case FIO_Q_BUSY:
+	case FIO_Q_BUSY:    //队列正在忙碌
 		if (!from_verify)
 			unlog_io_piece(td, io_u);
 		requeue_io_u(td, &io_u);
@@ -555,10 +543,8 @@ sync_done:
 		td_verror(td, -(*ret), "td_io_queue");
 		break;
 	}
-
 	if (break_on_this_error(td, ddir, ret))
 		return 1;
-
 	return 0;
 }
 
@@ -780,20 +766,6 @@ static int io_complete_bytes_exceeded(struct thread_data *td)
  *
  * Returns number of bytes written and trimmed.
  */
-static void krven_show_io_u_stat(int ret, struct thread_data *td, struct io_u *io_u) {
-    krven_debug_print("result : [%d] ", ret);
-	krven_debug_print("acct_ddir:[%d] ", io_u->acct_ddir);
-	krven_debug_print("size:[%lu:%llu] ", io_u->buflen, io_u->offset);
-	krven_debug_print("num:[%u] ", io_u->numberio);
-	krven_debug_print("start_time:[%ld:%d] ", io_u->start_time.tv_sec, io_u->start_time.tv_usec);
-	krven_debug_print("issue_time:[%ld:%d]", io_u->issue_time.tv_sec, io_u->issue_time.tv_usec);
-    krven_debug_print("comp_time:[%ld:%d]", io_u->comp_time.tv_sec, io_u->comp_time.tv_usec);
-    krven_debug_print("\n");
-    td->io_u_sum++;
-    td->io_u_usec += 1000000LL * (io_u->issue_time.tv_sec-io_u->start_time.tv_sec)
-                     + (io_u->issue_time.tv_usec-io_u->start_time.tv_usec);
-}
-
 static uint64_t do_io(struct thread_data *td)
 {
 	unsigned int i;
@@ -830,18 +802,14 @@ static uint64_t do_io(struct thread_data *td)
 	while ((td->o.read_iolog_file && !flist_empty(&td->io_log_list)) ||
 		(!flist_empty(&td->trim_list)) || !io_issue_bytes_exceeded(td) ||
 		td->o.time_based) {
-		struct timeval comp_time;
-		//struct timespec start_time;
-        //struct timespec end_time;
+        struct timeval comp_time;
 		struct io_u *io_u;
 		int full;
 		enum fio_ddir ddir;
-
 		check_update_rusage(td);
 
 		if (td->terminate || td->done)
 			break;
-
 		update_tv_cache(td);
 
 		if (runtime_exceeded(td, &td->tv_cache)) {
@@ -918,21 +886,20 @@ static uint64_t do_io(struct thread_data *td)
 				break;
 			ret = workqueue_enqueue(&td->io_wq, io_u);
 		} else {
-			//clock_gettime(CLOCK_REALTIME, &start_time);
+            //if is posixaio -> ret = 1
+            //else posixaio  -> ret = 0
             ret = td_io_queue(td, io_u);
 			if (io_queue_event(td, io_u, &ret, ddir, &bytes_issued, 1, &comp_time)) {
 				break;
 			}
             io_u->comp_time.tv_usec = comp_time.tv_usec;
             io_u->comp_time.tv_sec = comp_time.tv_sec;
-            //clock_gettime(CLOCK_REALTIME, &end_time);
-            //if(KRVEN_DEBUG) {
-            //    long int t_sec = end_time.tv_sec - start_time.tv_sec;
-            //    long int t_nsec = end_time.tv_nsec - start_time.tv_nsec;
-            //    log_info("solve time:[%ld %ld]\n", t_sec, t_nsec);
-            //}
-            //计算每一个io_u的延迟情况
-            krven_show_io_u_stat(ret, td, io_u);
+            //打印信息
+            krven_print_io_u(ret, io_u);
+            //save
+            td->io_u_sum++;
+            td->io_u_usec += 1000000LL * (io_u->issue_time.tv_sec-io_u->start_time.tv_sec)
+                             + (io_u->issue_time.tv_usec-io_u->start_time.tv_usec);
 			/*
 			 * See if we need to complete some commands. Note that
 			 * we can get BUSY even without IO queued, if the
@@ -1553,6 +1520,9 @@ static void *thread_main(void *data)
 	fio_gettime(&td->epoch, NULL);
 	fio_getrusage(&td->ru_start);
 	clear_state = 0;
+
+    krven_print_thread_data(td);
+    //while_running
 	while (keep_running(td)) {
 		uint64_t verify_bytes;
 		fio_gettime(&td->start, NULL);
@@ -1579,6 +1549,7 @@ static void *thread_main(void *data)
             verify_bytes = do_dry_run(td);
         }
 		else {
+            //进行一次io操作
             verify_bytes = do_io(td);
         }
 		clear_state = 1;
@@ -1616,7 +1587,6 @@ static void *thread_main(void *data)
 		 * See comment further up for why this is done here.
 		 */
 		check_update_rusage(td);
-
 		fio_mutex_down(stat_mutex);
 		update_runtime(td, elapsed_us, DDIR_READ);
 		fio_gettime(&td->start, NULL);
@@ -1944,8 +1914,6 @@ static void run_threads(void)
 
 	nr_thread = nr_process = 0;
 
-	krven_debug_print("thread_number is %d\n", thread_number);
-
 	for_each_td(td, i) {
 		if (td->o.use_thread)
 			nr_thread++;
@@ -2218,12 +2186,10 @@ static void *helper_thread_main(void *data)
 
 		if (helper_do_stat) {
 			helper_do_stat = 0;
-            log_info("2202:helper_do_stat\n");
 			__show_running_run_stats();
 		}
 
 		if (!is_backend) {
-            log_info("2207:is_backend == 0\n");
             print_thread_status();
         }
 	}
@@ -2256,7 +2222,7 @@ int fio_backend(void)
 {
 	struct thread_data *td;
 	int i;
-
+    krven_init();
 	if (exec_profile) {
 		if (load_profile(exec_profile))
 			return 1;
@@ -2285,17 +2251,11 @@ int fio_backend(void)
 
 	cgroup_list = smalloc(sizeof(*cgroup_list));
 	INIT_FLIST_HEAD(cgroup_list);
-
 	run_threads();
-
 	wait_for_helper_thread_exit();
-    krven_debug_print("2275:helper thread exit.\n");
-
 	if (!fio_abort) {
-        krven_debug_print("2278:show run stats.\n");
 		__show_run_stats();
-        krven_debug_print("2280:show run stats finished.\n");
-		if (write_bw_log) {
+       if (write_bw_log) {
 			for (i = 0; i < DDIR_RWDIR_CNT; i++) {
 				struct io_log *log = agg_io_log[i];
 				flush_log(log);
@@ -2304,7 +2264,6 @@ int fio_backend(void)
 		}
 	}
 
-    krven_debug_print("2289:options free.\n");
 	for_each_td(td, i) {
 		fio_options_free(td);
 		if (td->rusage_sem) {
