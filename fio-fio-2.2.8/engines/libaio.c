@@ -184,7 +184,6 @@ static int fio_libaio_queue(struct thread_data *td, struct io_u *io_u)
 	struct libaio_data *ld = td->io_ops->data;
 	fio_ro_check(td, io_u);
     //队列是否忙
-    //log_info("queue [%d %d]\n", ld->queued, td->o.iodepth);
     //忙的状态
 	if (ld->queued == td->o.iodepth)
 		return FIO_Q_BUSY;
@@ -252,6 +251,7 @@ static int fio_libaio_commit(struct thread_data *td)
 		iocbs = ld->iocbs + ld->tail;
         //Linux进行读写
 		ret = io_submit(ld->aio_ctx, nr, iocbs);
+        log_info("nr ret [%ld][%d]\n", nr, ret);
 		if (ret > 0) {
 			fio_libaio_queued(td, io_us, ret);
 			io_u_mark_submit(td, ret);

@@ -194,7 +194,6 @@ static int fio_posixaio_queue(struct thread_data *td,
 		return FIO_Q_COMPLETED;
 #endif
 	}
-
 	if (ret) {
 		int aio_err = errno;
 		/*
