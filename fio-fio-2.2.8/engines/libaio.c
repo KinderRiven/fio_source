@@ -141,6 +141,8 @@ static int user_io_getevents(io_context_t aio_ctx, unsigned int max,
 	return i;
 }
 
+//获得读取结束的信息
+//用于监听libaio异步读写的返回状态
 static int fio_libaio_getevents(struct thread_data *td, unsigned int min,
 				unsigned int max, const struct timespec *t)
 {
@@ -149,12 +151,10 @@ static int fio_libaio_getevents(struct thread_data *td, unsigned int min,
 	unsigned actual_min = td->o.iodepth_batch_complete == 0 ? 0 : min;
 	struct timespec __lt, *lt = NULL;
 	int r, events = 0;
-
 	if (t) {
 		__lt = *t;
 		lt = &__lt;
 	}
-
 	do {
 		if (o->userspace_reap == 1
 		    && actual_min == 0
@@ -165,6 +165,7 @@ static int fio_libaio_getevents(struct thread_data *td, unsigned int min,
 		} else {
 			r = io_getevents(ld->aio_ctx, actual_min,
 				max, ld->aio_events + events, lt);
+            log_info("getevents:[%d]\n", r);
 		}
 		if (r > 0)
 			events += r;
@@ -174,7 +175,6 @@ static int fio_libaio_getevents(struct thread_data *td, unsigned int min,
 		} else if (r != -EINTR)
 			break;
 	} while (events < min);
-
 	return r < 0 ? r : events;
 }
 
@@ -250,8 +250,9 @@ static int fio_libaio_commit(struct thread_data *td)
 		io_us = ld->io_us + ld->tail;
 		iocbs = ld->iocbs + ld->tail;
         //Linux进行读写
+        //这里进行大块的提交
 		ret = io_submit(ld->aio_ctx, nr, iocbs);
-        log_info("nr ret [%ld][%d]\n", nr, ret);
+        //log_info("nr ret [%ld][%d]\n", nr, ret);
 		if (ret > 0) {
 			fio_libaio_queued(td, io_us, ret);
 			io_u_mark_submit(td, ret);
