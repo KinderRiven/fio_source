@@ -349,7 +349,7 @@ int td_io_queue(struct thread_data *td, struct io_u *io_u)
 			td->ts.total_io_u[io_u->ddir]++;
 		}
 		//如果队列的内容大于等于iodepth,那么需要进行提交（commit）
-		log_info("submit commit [%u %u %u]\n", td->io_u_queued, td->o.iodepth, td->o.iodepth_batch);
+		//("submit commit [%u %u %u]\n", td->io_u_queued, td->o.iodepth, td->o.iodepth_batch);
 		if (td->io_u_queued >= td->o.iodepth_batch) {
 			r = td_io_commit(td);
 			if (r < 0)
@@ -405,7 +405,7 @@ int td_io_commit(struct thread_data *td)
 	if (td->io_ops->commit) {
 		//这里应该是要提交了
 		ret = td->io_ops->commit(td);
-		log_info("commit submit : [%d]\n", ret);
+		//log_info("commit submit : [%d]\n", ret);
 		if (ret)
 			td_verror(td, -ret, "io commit");
 	}

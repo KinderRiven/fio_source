@@ -960,13 +960,11 @@ reap:
 			i = 0;
 		} else
 			i = td->cur_depth;
-
 		if (i) {
 			ret = io_u_queued_complete(td, i);
 			if (td->o.fill_device && td->error == ENOSPC)
 				td->error = 0;
 		}
-
 		if (should_fsync(td) && td->o.end_fsync) {
 			td_set_runstate(td, TD_FSYNCING);
 			for_each_file(td, f, i) {
