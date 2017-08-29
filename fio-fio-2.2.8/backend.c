@@ -522,7 +522,7 @@ sync_done:
 		 * the io_u is really queued. if it does have such
 		 * a hook, it has to call io_u_queued() itself.
 		 */
-        //如果没有进行提交
+        //如果已经进行了提交？
 		if (td->io_ops->commit == NULL) {
             io_u_queued(td, io_u);
         }
@@ -683,7 +683,6 @@ reap:
 		full = queue_full(td) || (ret == FIO_Q_BUSY && td->cur_depth);
 		if (full || !td->o.iodepth_batch_complete)
 			ret = wait_for_completions(td, NULL);
-
 		if (ret < 0)
 			break;
 	}
@@ -1585,6 +1584,8 @@ static void *thread_main(void *data)
 
 		clear_io_state(td);
 		fio_gettime(&td->start, NULL);
+        //这里？
+        log_info("do_verify\n");
 		do_verify(td, verify_bytes);
 		/*
 		 * See comment further up for why this is done here.

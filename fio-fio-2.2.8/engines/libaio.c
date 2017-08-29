@@ -167,8 +167,9 @@ static int fio_libaio_getevents(struct thread_data *td, unsigned int min,
 				max, ld->aio_events + events, lt);
             log_info("getevents:[%d]\n", r);
 		}
-		if (r > 0)
-			events += r;
+		if (r > 0) {
+            events += r;
+        }
 		else if ((min && r == 0) || r == -EAGAIN) {
 			fio_libaio_commit(td);
 			usleep(100);
@@ -223,10 +224,9 @@ static void fio_libaio_queued(struct thread_data *td, struct io_u **io_us,
 
 	if (!fio_fill_issue_time(td))
 		return;
-
-	fio_gettime(&now, NULL);
-
-	for (i = 0; i < nr; i++) {
+    fio_gettime(&now, NULL);
+    //issue_time
+    for (i = 0; i < nr; i++) {
 		struct io_u *io_u = io_us[i];
 		memcpy(&io_u->issue_time, &now, sizeof(now));
 		io_u_queued(td, io_u);
@@ -240,10 +240,8 @@ static int fio_libaio_commit(struct thread_data *td)
 	struct io_u **io_us;
 	struct timeval tv;
 	int ret, wait_start = 0;
-
 	if (!ld->queued)
 		return 0;
-
 	do {
 		long nr = ld->queued;
 		nr = min((unsigned int) nr, ld->entries - ld->tail);
@@ -252,8 +250,7 @@ static int fio_libaio_commit(struct thread_data *td)
         //Linux进行读写
         //这里进行大块的提交
 		ret = io_submit(ld->aio_ctx, nr, iocbs);
-        //log_info("nr ret [%ld][%d]\n", nr, ret);
-		if (ret > 0) {
+        if (ret > 0) {
 			fio_libaio_queued(td, io_us, ret);
 			io_u_mark_submit(td, ret);
 			ld->queued -= ret;

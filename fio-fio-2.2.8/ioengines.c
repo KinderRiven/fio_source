@@ -224,7 +224,6 @@ int td_io_getevents(struct thread_data *td, unsigned int min, unsigned int max,
 		    const struct timespec *t)
 {
 	int r = 0;
-
 	/*
 	 * For ioengine=rdma one side operation RDMA_WRITE or RDMA_READ,
 	 * server side gets a message from the client
@@ -405,7 +404,6 @@ int td_io_commit(struct thread_data *td)
 	if (td->io_ops->commit) {
 		//这里应该是要提交了
 		ret = td->io_ops->commit(td);
-		//log_info("commit submit : [%d]\n", ret);
 		if (ret)
 			td_verror(td, -ret, "io commit");
 	}
