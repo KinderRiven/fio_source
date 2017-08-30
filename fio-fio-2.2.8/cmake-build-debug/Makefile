@@ -2040,6 +2040,33 @@ json.c.s:
 	$(MAKE) -f CMakeFiles/fio_fio_2_2_8.dir/build.make CMakeFiles/fio_fio_2_2_8.dir/json.c.s
 .PHONY : json.c.s
 
+krven_debug.o: krven_debug.c.o
+
+.PHONY : krven_debug.o
+
+# target to build an object file
+krven_debug.c.o:
+	$(MAKE) -f CMakeFiles/fio_fio_2_2_8.dir/build.make CMakeFiles/fio_fio_2_2_8.dir/krven_debug.c.o
+.PHONY : krven_debug.c.o
+
+krven_debug.i: krven_debug.c.i
+
+.PHONY : krven_debug.i
+
+# target to preprocess a source file
+krven_debug.c.i:
+	$(MAKE) -f CMakeFiles/fio_fio_2_2_8.dir/build.make CMakeFiles/fio_fio_2_2_8.dir/krven_debug.c.i
+.PHONY : krven_debug.c.i
+
+krven_debug.s: krven_debug.c.s
+
+.PHONY : krven_debug.s
+
+# target to generate assembly for a file
+krven_debug.c.s:
+	$(MAKE) -f CMakeFiles/fio_fio_2_2_8.dir/build.make CMakeFiles/fio_fio_2_2_8.dir/krven_debug.c.s
+.PHONY : krven_debug.c.s
+
 lib/axmap.o: lib/axmap.c.o
 
 .PHONY : lib/axmap.o
@@ -3639,6 +3666,9 @@ help:
 	@echo "... json.o"
 	@echo "... json.i"
 	@echo "... json.s"
+	@echo "... krven_debug.o"
+	@echo "... krven_debug.i"
+	@echo "... krven_debug.s"
 	@echo "... lib/axmap.o"
 	@echo "... lib/axmap.i"
 	@echo "... lib/axmap.s"

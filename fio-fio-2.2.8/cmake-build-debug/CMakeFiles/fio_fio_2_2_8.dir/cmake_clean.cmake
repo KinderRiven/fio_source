@@ -121,6 +121,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/fio_fio_2_2_8.dir/trim.c.o"
   "CMakeFiles/fio_fio_2_2_8.dir/verify.c.o"
   "CMakeFiles/fio_fio_2_2_8.dir/workqueue.c.o"
+  "CMakeFiles/fio_fio_2_2_8.dir/krven_debug.c.o"
   "fio_fio_2_2_8.pdb"
   "fio_fio_2_2_8"
 )

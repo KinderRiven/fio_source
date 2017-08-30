@@ -1584,8 +1584,8 @@ static void *thread_main(void *data)
 
 		clear_io_state(td);
 		fio_gettime(&td->start, NULL);
-        //这里？
-        log_info("do_verify\n");
+        //这里
+        //log_info("do_verify\n");
 		do_verify(td, verify_bytes);
 		/*
 		 * See comment further up for why this is done here.

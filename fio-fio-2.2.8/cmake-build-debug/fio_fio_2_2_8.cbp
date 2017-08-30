@@ -616,6 +616,12 @@
 		<Unit filename="/Users/hanshukai/fio/fio-fio-2.2.8/json.h">
 			<Option target="fio_fio_2_2_8"/>
 		</Unit>
+		<Unit filename="/Users/hanshukai/fio/fio-fio-2.2.8/krven_debug.c">
+			<Option target="fio_fio_2_2_8"/>
+		</Unit>
+		<Unit filename="/Users/hanshukai/fio/fio-fio-2.2.8/krven_debug.h">
+			<Option target="fio_fio_2_2_8"/>
+		</Unit>
 		<Unit filename="/Users/hanshukai/fio/fio-fio-2.2.8/lib/axmap.c">
 			<Option target="fio_fio_2_2_8"/>
 		</Unit>
